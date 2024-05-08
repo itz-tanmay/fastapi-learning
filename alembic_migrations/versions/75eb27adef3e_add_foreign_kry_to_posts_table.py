@@ -1,0 +1,30 @@
+"""add foreign-kry to posts table
+
+Revision ID: 75eb27adef3e
+Revises: 36c4c8370991
+Create Date: 2024-05-07 16:47:11.293812
+
+"""
+from typing import Sequence, Union
+
+from alembic import op
+import sqlalchemy as sa
+
+
+# revision identifiers, used by Alembic.
+revision: str = '75eb27adef3e'
+down_revision: Union[str, None] = '36c4c8370991'
+branch_labels: Union[str, Sequence[str], None] = None
+depends_on: Union[str, Sequence[str], None] = None
+
+
+def upgrade() -> None:
+    op.add_column("posts",
+                  sa.Column("owner_id", sa.Integer(), nullable=False))
+    op.create_foreign_key("posts_users_fk", source_table="posts",
+                          referent_table="users", local_cols=["owner_id"], remote_cols=["id"], ondelete="CASCADE")
+
+
+def downgrade() -> None:
+    op.drop_constraint("posts_users_fk", table_name="posts")
+    op.drop_column("posts", "owner_id")
